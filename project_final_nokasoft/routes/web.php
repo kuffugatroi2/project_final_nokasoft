@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Admin\HomeController;
+use App\Http\Controllers\Admin\LoginAdminController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -16,3 +18,13 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+
+/*---------------------------------------------------BACKEND---------------------------------------------------------------*/
+
+// Login
+Route::get('/admin/login', [LoginAdminController::class, 'show']);
+
+/*---------------------------------------------------ADMIN---------------------------------------------------------------*/
+
+Route::get('/home-page', [HomeController::class, 'home']);
