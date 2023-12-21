@@ -29,16 +29,20 @@
         <div class="animate form login_form">
             <section class="login_content">
                 <img src="img-logo/VT_luxury.png" alt="Logo">
-                <form>
+                <div id="alert" style="opacity: 1; transition: opacity 2s;">
+                    @include('Layout.message')
+                </div>
+                <form action="{{ route('admin_authentication.login') }}" method="POST">
+                    @csrf
                     <h1>Login Form</h1>
                     <div>
-                        <input type="email" class="form-control" placeholder="Username" required="" />
+                        <input type="email" name="email" class="form-control" placeholder="Username" required="" />
                     </div>
                     <div>
-                        <input type="password" class="form-control" placeholder="Password" required="" />
+                        <input type="password" name="password" class="form-control" placeholder="Password" required="" />
                     </div>
                     <div>
-                        <a class="btn btn-default submit" href="#">Log in</a>
+                        <button class="btn btn-default submit">Login</button>
                         <a class="reset_pass" href="#">Lost your password?</a>
                     </div>
                     <div class="separator">
@@ -50,5 +54,23 @@
         </div>
     </div>
 </body>
+
+<script>
+    /*
+        Trong đoạn mã này sẽ:
+        Đặt giá trị 'opacity' của phần tử có id "alert" thành 0 sau 10s
+        Sau đó, đặt thuộc tính 'display' thành none sau 2s để ẩn phần tử
+        (Hiệu ứng mờ dần sẽ diễn ra trong vòng 2s)
+    */
+    setTimeout(function() {
+        // Lấy thẻ div chứa thông báo
+        var alertDiv = document.getElementById('alert');
+        alertDiv.style.opacity = 0;
+        setTimeout(function() {
+            alertDiv.style.display = 'none';
+        }, 2000); // Mất sau 2 giây
+    }, 5000); // Hiển thị trong 10 giây
+
+</script>
 
 </html>
