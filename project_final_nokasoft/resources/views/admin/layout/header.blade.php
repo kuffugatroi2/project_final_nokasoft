@@ -16,7 +16,7 @@
                             <span class="badge bg-red pull-right">50%</span>
                             <span>Đổi mật khẩu</span>
                         </a>
-                        <a class="dropdown-item" href="login.html"><i class="fa fa-sign-out pull-right"></i> Log Out</a>
+                        <a class="dropdown-item" href="{{ route('admin_authentication.logout') }}"><i class="fa fa-sign-out pull-right"></i> Log Out</a>
                     </div>
                 </li>
 

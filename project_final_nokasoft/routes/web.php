@@ -23,8 +23,15 @@ Route::get('/', function () {
 /*---------------------------------------------------BACKEND---------------------------------------------------------------*/
 
 // Login
-Route::get('/admin/login', [LoginAdminController::class, 'show']);
+Route::get('/admin/login', [LoginAdminController::class, 'show'])->name('login');
+Route::post('/login', [LoginAdminController::class, 'login'])->name('admin_authentication.login');
+Route::get('/admin/logout', [LoginAdminController::class, 'logout'])->name('admin_authentication.logout');
 
 /*---------------------------------------------------ADMIN---------------------------------------------------------------*/
 
-Route::get('/home-page', [HomeController::class, 'home']);
+Route::middleware(['admin'])->group(function () {
+    Route::prefix('admin')->group(function () {
+        Route::get('/home-page', [HomeController::class, 'home'])->name('admin.home');
+    });
+});
+
