@@ -95,6 +95,46 @@
     <!-- Custom Theme Scripts -->
     <script src="gentelella-master/build/js/custom.min.js"></script>
 
+    @yield('script')
+    <script>
+        // ------------------------------Xử lý hiển thị thông báo---------------------------------
+        /*
+                Trong đoạn mã này sẽ:
+                Đặt giá trị 'opacity' của phần tử có id "alert" thành 0 sau 10s
+                Sau đó, đặt thuộc tính 'display' thành none sau 2s để ẩn phần tử
+                (Hiệu ứng mờ dần sẽ diễn ra trong vòng 2s)
+            */
+        setTimeout(function() {
+            // Lấy thẻ div chứa thông báo
+            var alertDiv = document.getElementById('alert');
+            alertDiv.style.opacity = 0;
+            setTimeout(function() {
+                alertDiv.style.display = 'none';
+            }, 2000); // Mất sau 2 giây
+        }, 5000); // Hiển thị trong 5 giây
+
+        // ------------------------------Xử lý show filter tìm kiếm---------------------------------
+        // Chọn phần tử có class là "show-filter"
+        var showFilterBtn = document.querySelector('.show-filter');
+        var iconShowFilter = document.querySelector('.icon-show-filter')
+        // chọn form có id='filter-form'
+        var filterForm = document.getElementById('filter-form');
+
+        // Gán sự kiện click cho phần tử
+        showFilterBtn.addEventListener('click', function() {
+            // Kiểm tra trạng thái hiện tại của form
+            var isFormHidden = filterForm.classList.contains('d-none');
+            if (isFormHidden) {
+                filterForm.classList.remove('d-none');
+                iconShowFilter.classList.remove('fa-chevron-down');
+                iconShowFilter.classList.add('fa-chevron-up');
+            } else {
+                filterForm.classList.add('d-none');
+                iconShowFilter.classList.remove('fa-chevron-up');
+                iconShowFilter.classList.add('fa-chevron-down');
+            }
+        });
+    </script>
 </body>
 
 </html>gentelella-master

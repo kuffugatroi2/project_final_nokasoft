@@ -19,6 +19,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        $this->app->bind(
+            'App\Repositories\Admin\AdminRepositoryInterface',
+            'App\Repositories\Admin\AdminRepository'
+        );
+        $this->app->bind(
+            'App\Repositories\Brand\BrandRepositoryInterface',
+            'App\Repositories\Brand\BrandRepository'
+        );
     }
 }
