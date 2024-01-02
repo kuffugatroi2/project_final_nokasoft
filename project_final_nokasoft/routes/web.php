@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\HomeController;
 use App\Http\Controllers\Admin\LoginAdminController;
+use App\Http\Controllers\Admin\BrandController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -32,6 +33,10 @@ Route::get('/admin/logout', [LoginAdminController::class, 'logout'])->name('admi
 Route::middleware(['admin'])->group(function () {
     Route::prefix('admin')->group(function () {
         Route::get('/home-page', [HomeController::class, 'home'])->name('admin.home');
+        //Brand
+        Route::resource('brands', BrandController::class);
+        Route::post('/delete-all', [BrandController::class, 'deleteAll'])->name('brands.delete_all');
+        Route::get('status-change-brand/{id}', [BrandController::class, 'statusChange'])->name('brands.status_change');
     });
 });
 

@@ -14,4 +14,9 @@ class Admin extends Authenticatable
     protected $table = 'admins';
 
     use HasFactory;
+
+    public function brands()
+    {
+        return $this->hasMany(Brand::class);
+    }
 }
