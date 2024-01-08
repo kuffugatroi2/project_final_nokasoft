@@ -27,5 +27,9 @@ class AppServiceProvider extends ServiceProvider
             'App\Repositories\Brand\BrandRepositoryInterface',
             'App\Repositories\Brand\BrandRepository'
         );
+        $this->app->bind(
+            'App\Repositories\Category\CategoryRepositoryInterface',
+            'App\Repositories\Category\CategoryRepository'
+        );
     }
 }

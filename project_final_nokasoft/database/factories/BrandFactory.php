@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Admin;
+use App\Models\Brand;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -18,7 +19,7 @@ class BrandFactory extends Factory
     public function definition(): array
     {
         $status = ['active', 'unactive'];
-        $brands = ['Vertu', 'Rolex', 'Omega', 'Tag Heuer', 'Patek Philippe', 'Apple', 'Samsung', 'Huawei'];
+        $brands = ['Vertu', 'Apple', 'Rolex', 'Hublot', 'Franck Muller', 'Chopard', 'Audemars Piguet', 'Patel Philippe'];
         $adminIds = Admin::pluck('id')->toArray();
 
         return [
@@ -26,6 +27,8 @@ class BrandFactory extends Factory
             'status' => $this->faker->randomElement($status),
             'created_by' => $this->faker->randomElement($adminIds),
             'updated_by' => $this->faker->randomElement($adminIds),
+            'created_at' => $this->faker->date("Y-m-d H:i:s"),
+            'updated_at' => $this->faker->date("Y-m-d H:i:s"),
         ];
     }
 }

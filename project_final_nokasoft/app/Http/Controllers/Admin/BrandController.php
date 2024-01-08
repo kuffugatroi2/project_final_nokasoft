@@ -7,14 +7,18 @@ use App\Http\Requests\Admin\Brand\BrandFormRequest;
 use App\Models\Brand;
 use Illuminate\Http\Request;
 use App\Services\BrandService;
+use App\Services\CategoryService;
 
 class BrandController extends Controller
 {
     protected $brandService;
+    protected $categoryService;
 
-    public function __construct(BrandService $brandService)
+
+    public function __construct(BrandService $brandService, CategoryService $categoryService)
     {
         $this->brandService = $brandService;
+        $this->categoryService = $categoryService;
     }
 
     /**
@@ -22,8 +26,10 @@ class BrandController extends Controller
      */
     public function index(Request $request)
     {
-        $brands = $this->brandService->index($request);
-        return view('admin.brand.index', compact('brands'));
+        $data = $this->brandService->index($request);
+        $activeBrand = $this->categoryService->index($request);
+        $listIdBrand = $activeBrand['listIdBrand'];
+        return view('admin.brand.index', compact('data', 'listIdBrand'));
     }
 
     /**
@@ -63,8 +69,11 @@ class BrandController extends Controller
     public function edit($id)
     {
         $brand = $this->brandService->edit($id);
-        if (isset($brand['error_subcode']) && $brand['error_subcode'] == 404)
+        if ((isset($brand['error_subcode']) && $brand['error_subcode'] == 404) || $brand['status'] == 500) {
             return response()->json(['message' => $brand['message'], 'status' => $brand['error_subcode']]);
+        } else if ($brand['status'] == 500) {
+            return response()->json(['error' => $brand['error'], 'status' => $brand['status']]);
+        }
         $data = [
             'action' => route('brands.update', $id),
             'method' => 'POST',
@@ -84,8 +93,11 @@ class BrandController extends Controller
         if (isset($brand['checkIssetName']) && $brand['checkIssetName'] == false) {
             return redirect()->back()->with('error', $brand['message']);
         }
-        if (isset($brand['error_subcode']) && $brand['error_subcode'] == 404)
+        if ((isset($brand['error_subcode']) && $brand['error_subcode'] == 404) || $brand['status'] == 500) {
             return response()->json(['message' => $brand['message'], 'status' => $brand['error_subcode']]);
+        } else if ($brand['status'] == 500) {
+            return response()->json(['error' => $brand['error'], 'status' => $brand['status']]);
+        }
         return redirect()->route('brands.index')->with(($brand['status'] == 200) ? 'message' : 'error', ($brand['status'] == 200) ? 'Update thương hiệu thành công!' : 'Update thương hiệu thất bại!');
     }
 
@@ -95,8 +107,11 @@ class BrandController extends Controller
     public function destroy($id)
     {
         $brand = $this->brandService->destroy($id);
-        if (isset($brand['error_subcode']) && $brand['error_subcode'] == 404)
+        if ((isset($brand['error_subcode']) && $brand['error_subcode'] == 404) || $brand['status'] == 500) {
             return response()->json(['message' => $brand['message'], 'status' => $brand['error_subcode']]);
+        } else if ($brand['status'] == 500) {
+            return response()->json(['error' => $brand['error'], 'status' => $brand['status']]);
+        }
         return redirect()->back()->with(($brand['status'] == 200) ? 'message' : 'error', ($brand['status'] == 200) ? 'Xóa thương hiệu thành công!' : 'Xóa thương hiệu thất bại!');
     }
 
@@ -109,8 +124,11 @@ class BrandController extends Controller
     public function statusChange($id)
     {
         $brand = $this->brandService->statusChange($id);
-        if (isset($brand['error_subcode']) && $brand['error_subcode'] == 404)
+        if ((isset($brand['error_subcode']) && $brand['error_subcode'] == 404) || $brand['status'] == 500) {
             return response()->json(['message' => $brand['message'], 'status' => $brand['error_subcode']]);
+        } else if ($brand['status'] == 500) {
+            return response()->json(['error' => $brand['error'], 'status' => $brand['status']]);
+        }
         return redirect()->route('brands.index')->with(($brand['status'] == 200) ? 'message' : 'error', ($brand['status'] == 200) ? 'Update trạng thái thành công!' : 'Update trạng thái thất bại!');
     }
 }

@@ -1,13 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Admin\Brand;
+namespace App\Http\Requests\Admin\Category;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
-use function PHPUnit\Framework\isNull;
-
-class BrandFormRequest extends FormRequest
+class CategoryFormRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,15 +22,16 @@ class BrandFormRequest extends FormRequest
     public function rules(): array
     {
         $parameter = $this->route()->parameters(); // Lấy parameters để kiểm tra xem là chức năng create hay update
-        // $brandId = isset($parameter['brand']) ? decrypt($parameter['brand']) : null;
-        // $rules = !empty($parameter) ? 'required|regex:/^[a-zA-Z]+[a-zA-Z0-9]*$/u' : 'required|unique:brands,name|regex:/^[a-zA-Z]+[a-zA-Z0-9]*$/u';
-        $rules = !empty($parameter) ? '' : 'unique:brands,name';
+        $rules = !empty($parameter) ? '' : 'unique:categories,name';
         return [
             'name' => [
                 'required',
-                // 'regex:/^[a-zA-Z\s]+[a-zA-Z0-9\s]*$/u',
                 'regex:/^[a-zA-Z][a-zA-Z\d\p{L}\s]*$/u',
                 $rules,
+            ],
+            'type' => [
+                'required',
+                'regex:/^[a-zA-Z][a-zA-Z\d\p{L}\s]*$/u',
             ],
         ];
     }
@@ -42,9 +40,11 @@ class BrandFormRequest extends FormRequest
     {
         $inputName = $this->input('name');
         return [
-            'name.required' => "Tên thương hiệu không được trống!",
-            'name.unique' => "Thương hiệu $inputName đã tồn tại!",
-            'name.regex' => "Tên thương hiệu chỉ được chứa chữ cái hoặc số, và phải bắt đầu bằng chữ cái!",
+            'name.required' => "Tên danh mục không được trống!",
+            'name.unique' => "Danh mục $inputName đã tồn tại!",
+            'name.regex' => "Tên danh mục chỉ được chứa chữ cái hoặc số, và phải bắt đầu bằng chữ cái!",
+            'type.required' => "Loại danh mục không được trống!",
+            'type.regex' => "Loại danh mục chỉ được chứa chữ cái hoạc số, và phải bắt đầu bằng chữ cái!",
         ];
     }
 }

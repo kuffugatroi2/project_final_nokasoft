@@ -2,20 +2,21 @@
 
 namespace App\Services;
 
-use App\Repositories\Brand\BrandRepositoryInterface;
+use App\Repositories\Category\CategoryRepositoryInterface;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
-class BrandService
+class CategoryService
 {
-    protected $brandRepository;
+    protected $categoryRepository;
+    protected $adminRepository;
     protected $today;
 
-    public function __construct(BrandRepositoryInterface $brandRepository)
+    public function __construct(CategoryRepositoryInterface $categoryRepository)
     {
-        $this->brandRepository = $brandRepository;
+        $this->categoryRepository = $categoryRepository;
         $this->today = Carbon::now('Asia/Ho_Chi_Minh')->format('Y-m-d H:i:s');
     }
 
@@ -24,11 +25,14 @@ class BrandService
         $params = $request->all();
         $filter = array_filter($params);
         try {
-            $data = $this->brandRepository->all($filter);
+            $data = $this->categoryRepository->all($filter);
+            $listIdBrand = array_column($data['brands'], 'id');
             return [
                 'status' => 200,
-                'brands' => $data['brands'],
+                'categories' => $data['categories'],
                 'admins' => $data['admins'],
+                'brands' => $data['brands'],
+                'listIdBrand' => $listIdBrand,
             ];
         } catch (Exception $exception) {
             return [
@@ -40,19 +44,19 @@ class BrandService
 
     public function store($request)
     {
+        $input = $request->only('brand_id', 'name', 'type', 'status');
+        $input['created_by'] = Auth::guard('admin')->id();
+        $input['updated_by'] = Auth::guard('admin')->id();
+        $input['created_at'] = $this->today;
+        $input['updated_at'] = $this->today;
+
         DB::beginTransaction();
         try {
-            $input = $request->only('name', 'status');
-            $input['created_by'] = Auth::guard('admin')->id();
-            $input['updated_by'] = Auth::guard('admin')->id();
-            $input['created_at'] = $this->today;
-            $input['updated_at'] = $this->today;
-
-            $brand = $this->brandRepository->store($input);
+            $category = $this->categoryRepository->store($input);
             DB::commit();
             return [
                 'status' => 200,
-                'data' => $brand
+                'data' => $category
             ];
         } catch (Exception $e) {
             DB::rollBack();
@@ -67,7 +71,7 @@ class BrandService
     {
         DB::beginTransaction();
         try {
-            $brand = $this->brandRepository->edit(decrypt($id));
+            $brand = $this->categoryRepository->edit(decrypt($id));
             if (is_null($brand)) {
                 return [
                     'success' => false,
@@ -91,12 +95,12 @@ class BrandService
 
     public function update($request, $id)
     {
-        $input = $request->only('name', 'status');
+        $input = $request->only('brand_id', 'name', 'type', 'status');
         $input['updated_by'] = Auth::guard('admin')->id();
         $input['updated_at'] = $this->today;
 
-        $brand = $this->edit($id);
-        if ($brand['status'] != 200) {
+        $category = $this->edit($id);
+        if ($category['status'] != 200) {
             return [
                 'success' => false,
                 'error_subcode' => 404,
@@ -105,23 +109,23 @@ class BrandService
         }
         $resultCheck = true;
         $inputName = $input['name'];
-        $listBrand = $this->getListBrand();
-        $checkName = in_array($inputName, $listBrand['listNameBrand']);
-        if ($checkName && $inputName != $brand['data']['name']) {
+        $listCategory = $this->getListCategory();
+        $checkName = in_array($inputName, $listCategory['listNameCategory']);
+        if ($checkName && $inputName != $category['data']['name']) {
             $resultCheck = false;
             return [
                 'status' => 500,
                 'checkIssetName' => $resultCheck,
-                'message' => "Thương hiệu $inputName đã tồn tại!"
+                'message' => "Danh mục $inputName đã tồn tại!"
             ];
         }
         DB::beginTransaction();
         try {
-            $brand = $this->brandRepository->update($input, decrypt($id));
+            $category = $this->categoryRepository->update($input, decrypt($id));
             DB::commit();
             return [
                 'status' => 200,
-                'data' => $brand
+                'data' => $category
             ];
         } catch (Exception $e) {
             DB::rollBack();
@@ -138,8 +142,8 @@ class BrandService
             'updated_by' => Auth::guard('admin')->id(),
             'deleted_at' => $this->today,
         ];
-        $brand = $this->edit($id);
-        if ($brand['status'] != 200) {
+        $category = $this->edit($id);
+        if ($category['status'] != 200) {
             return [
                 'success' => false,
                 'error_subcode' => 404,
@@ -148,7 +152,7 @@ class BrandService
         }
         DB::beginTransaction();
         try {
-            $brand = $this->brandRepository->destroy($input, decrypt($id));
+            $category = $this->categoryRepository->destroy($input, decrypt($id));
             DB::commit();
             return [
                 'status' => 200,
@@ -166,11 +170,11 @@ class BrandService
     {
         // Lấy mảng dữ liệu từ phần thân yêu cầu
         $requestData = $request->json()->all();
-        // Truy cập mảng brandIds trong dữ liệu
-        $brandIds = $requestData['brandIds'];
+        // Truy cập mảng categoryIds trong dữ liệu
+        $categoryIds = $requestData['brandIds'];
         DB::beginTransaction();
         try {
-            $this->brandRepository->deleteAll($brandIds, $this->today);
+            $this->categoryRepository->deleteAll($categoryIds, $this->today);
             DB::commit();
             return [
                 'status' => 200,
@@ -190,23 +194,23 @@ class BrandService
             'updated_by' => Auth::guard('admin')->id(),
             'updated_at' => $this->today,
         ];
-        $brand = $this->edit($id);
-        if ($brand['status'] != 200) {
+        $category = $this->edit($id);
+        if ($category['status'] != 200) {
             return [
                 'success' => false,
                 'error_subcode' => 404,
                 'message' => 'not_found!'
             ];
         }
-        $input['status'] = $brand['data']['status'];
+        $input['status'] = $category['data']['status'];
 
         DB::beginTransaction();
         try {
-            $brand = $this->brandRepository->statusChange($input, decrypt($id));
+            $category = $this->categoryRepository->statusChange($input, decrypt($id));
             DB::commit();
             return [
                 'status' => 200,
-                'data' => $brand
+                'data' => $category
             ];
         } catch(Exception $e) {
             DB::rollBack();
@@ -217,8 +221,8 @@ class BrandService
         }
     }
 
-    public function getListBrand()
+    public function getListCategory()
     {
-        return $this->brandRepository->getListBrand();
+        return $this->categoryRepository->getListCategory();
     }
 }

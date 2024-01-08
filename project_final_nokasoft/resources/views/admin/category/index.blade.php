@@ -13,7 +13,7 @@
                 </div>
                 <div class="x_content d-none" id="filter-form">
                     <br />
-                    <form action="{{ route('brands.index') }}" method="GET" id="demo-form2" data-parsley-validate
+                    <form action="{{ route('categories.index') }}" method="GET" id="demo-form2" data-parsley-validate
                         class="form-horizontal form-label-left">
                         <div class="container">
                             <div class="row">
@@ -21,8 +21,12 @@
                                     <div class="form-group row ">
                                         <label class="control-label col-md-3 col-sm-3 ">Thương hiệu</label>
                                         <div class="col-md-9 col-sm-9 ">
-                                            <input type="text" class="form-control" name="name"
-                                                placeholder="Vui lòng nhập tên thương hiệu">
+                                            <select class="form-control" name="brand_id">
+                                                <option value="">Vui lòng chọn thương hiệu</option>
+                                                @foreach ($data['brands'] as $brand)
+                                                    <option value="{{ $brand['id'] }}">{{ $brand['name'] }}</option>
+                                                @endforeach
+                                            </select>
                                         </div>
                                     </div>
                                     <div class="form-group row ">
@@ -38,6 +42,13 @@
                                     </div>
                                 </div>
                                 <div class="col">
+                                    <div class="form-group row ">
+                                        <label class="control-label col-md-3 col-sm-3 ">Danh mục</label>
+                                        <div class="col-md-9 col-sm-9 ">
+                                            <input type="text" class="form-control" name="name"
+                                                placeholder="Vui lòng nhập tên danh mục">
+                                        </div>
+                                    </div>
                                     <div class="form-group row">
                                         <label class="control-label col-md-3 col-sm-3 ">Trạng thái</label>
                                         <div class="col-md-9 col-sm-9 ">
@@ -86,7 +97,7 @@
                                     <div class="row">
                                         <div class="col-sm">
                                             <div class="selectbox">
-                                                <form action="{{ route('brands.index') }}" method="GET">
+                                                <form action="{{ route('categories.index') }}" method="GET">
                                                     <label for="brand">Chọn</label>
                                                     <select name="select-item" id="brands"
                                                         style="width: 50px; height:38px" onchange="this.form.submit()">
@@ -100,9 +111,9 @@
                                             </div>
                                         </div>
                                         <div class="col-sm d-flex justify-content-end">
-                                            <a href="{{ route('brands.create') }}" class="btn btn-success">Tạo mới</a>
+                                            <a href="{{ route('categories.create') }}" class="btn btn-success">Tạo mới</a>
                                             <button class="btn btn-danger delete-all"
-                                                onclick="return confirm('Bạn có chắc muốn xóa những thương hiệu này không?')">Xóa
+                                                onclick="return confirm('Bạn có chắc muốn xóa những danh mục này không?')">Xóa
                                                 all</button>
                                         </div>
                                     </div>
@@ -113,8 +124,10 @@
                                     <thead>
                                         <tr>
                                             <th><input type="checkbox"></th>
+                                            <th>Danh mục</th>
                                             <th>Thương hiệu</th>
                                             <th>Trạng thái</th>
+                                            <th>Loại</th>
                                             <th>Người tạo</th>
                                             <th>Ngày tạo</th>
                                             <th>Ngày update</th>
@@ -122,22 +135,21 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach ($data['brands'] as $value)
+                                        @foreach ($data['categories'] as $value)
                                             <tr>
-                                                <td>
-                                                    <input type="checkbox" value="{{ $value->id }}"
-                                                        {{ isset($listIdBrand) ? checkDisabled($value->id, $listIdBrand) : '' }}>
-                                                </td>
+                                                <td><input type="checkbox" value="{{ $value->id }}"></td>
                                                 <td>{{ $value->name }}</td>
+                                                <td>{{ $value->brand->name }}</td>
                                                 <td>
                                                     {{ $value->status }}
                                                     {!! convertSatus($value->status, $value->id) !!}
                                                 </td>
+                                                <td>{{ $value->type }}</td>
                                                 <td>{{ $value->admin->name }}</td>
                                                 <td>{{ $value->created_at }}</td>
                                                 <td>{{ $value->updated_at }}</td>
                                                 <td class="d-flex justify-content-center">
-                                                    <form action="{{ route('brands.destroy', encrypt($value->id)) }}"
+                                                    <form action="{{ route('categories.destroy', encrypt($value->id)) }}"
                                                         method="POST">
                                                         @csrf
                                                         @method('DELETE')
@@ -148,7 +160,14 @@
                                                             </label>
                                                             <div class="dropdown-menu text-center"
                                                                 aria-labelledby="dropdownMenuButton">
-                                                                {!! isset($listIdBrand) ? checkcheck($value->id, $listIdBrand, 'brands.edit') : '' !!}
+                                                                <a class="dropdown-item"
+                                                                    href="{{ route('categories.edit', encrypt($value->id)) }}">
+                                                                    <i class="text-primary mr-1 fa fa-edit"></i>Sửa
+                                                                </a>
+                                                                <button type="submit" class="dropdown-item"
+                                                                    onclick="return confirm('Bạn có chắc muốn xóa danh mục này không?')">
+                                                                    <i class="text-danger mr-1 fa fa-trash"></i>Xóa
+                                                                </button>
                                                             </div>
                                                         </div>
                                                     </form>
@@ -159,9 +178,9 @@
                                 </table>
                             </div>
                         </div>
-                        @if (!empty($data['brands']))
+                        @if (!empty($brands['data']))
                             <div class="col-lg-12 mt-3 d-flex justify-content-center">
-                                {{ $data['brands']->links('pagination::bootstrap-4') }}
+                                {{ $brands['data']->links('pagination::bootstrap-4') }}
                             </div>
                         @endif
                     </div>
@@ -171,20 +190,19 @@
     </div>
     <script>
         /*
-                                    document.addEventListener('DOMContentLoaded', function () { ... });
-                                    - Đoạn mã này đảm bảo rằng tất cả các phần tử html được tải hoàn toàn
-                                    trước khi thực hiện các hành động của javascript
-                                    DOMContentLoaded: để đảm bảo rằng mã Javascript sẽ thực hiện sau khi trang đã được tải xong
-                                */
+                    document.addEventListener('DOMContentLoaded', function () { ... });
+                    - Đoạn mã này đảm bảo rằng tất cả các phần tử html được tải hoàn toàn
+                    trước khi thực hiện các hành động của javascript
+                    DOMContentLoaded: để đảm bảo rằng mã Javascript sẽ thực hiện sau khi trang đã được tải xong
+                */
 
         document.addEventListener('DOMContentLoaded', function() {
             // ------------------------------Xử lý xóa all checkbox---------------------------------
 
             // Lấy thẻ checkbox ở thẻ thead
             var mainCheckbox = document.querySelector('#datatable-checkbox thead input[type="checkbox"]');
-            // Lấy tất cả các ô checkbox ở tbody trừ các thẻ có thuộc tính 'disabled'
-            var checkboxes = document.querySelectorAll(
-                '#datatable-checkbox tbody input[type="checkbox"]:not([disabled])');
+            // Lấy tất cả các ô checkbox ở tbody
+            var checkboxes = document.querySelectorAll('#datatable-checkbox tbody input[type="checkbox"]');
 
             // Gán sự kiện click cho phần tử
             mainCheckbox.addEventListener('click', function() {
@@ -225,7 +243,7 @@
                 }
                 //Kiểm tra nếu có ít nhất một sản phẩm đã được chọn
                 if (selectedBrandIds.length > 0) {
-                    fetch('{{ route('brands.delete_all') }}', {
+                    fetch('{{ route('categories.delete_all') }}', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -257,7 +275,7 @@
                         })
                         .catch(error => console.error('Error:', error));
                 } else {
-                    alert('Vui lòng chọn ít nhất một thương hiệu để xóa!');
+                    alert('Vui lòng chọn ít nhất một danh mục để xóa!');
                 }
             });
         });

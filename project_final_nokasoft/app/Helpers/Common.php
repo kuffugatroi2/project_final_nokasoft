@@ -28,17 +28,34 @@ function convertSatus($status, $id)
                 $html .= '<a onclick="event.stopImmediatePropagation();if(confirm(\'Bạn có chắc muốn thay đổi trạng thái không?\')){window.location.href=\'' . route('brands.status_change', encrypt($id)) . '\'}"><i class="ml-2 fa fa-exchange ' . ($status == activeStatus ? 'text-success' : 'text-danger') . '" title="Thay đổi trạng thái"></i></a>';
                 break;
             case 'categories':
-                $html .= '<a onclick="event.stopImmediatePropagation();if(confirm(\'Bạn có chắc muốn thay đổi trạng thái không?\')){window.location.href=\'' . route('categories.status_change', encrypt($id)) . '\'}"><i class="fa fa-exchange ' . ($status == activeStatus ? 'text-success' : 'text-danger') . '" title="Thay đổi trạng thái"></i></a>';
+                $html .= '<a onclick="event.stopImmediatePropagation();if(confirm(\'Bạn có chắc muốn thay đổi trạng thái không?\')){window.location.href=\'' . route('categories.status_change', encrypt($id)) . '\'}"><i class="ml-2 fa fa-exchange ' . ($status == activeStatus ? 'text-success' : 'text-danger') . '" title="Thay đổi trạng thái"></i></a>';
                 break;
             case 'products':
-                $html .= '<a onclick="event.stopImmediatePropagation();if(confirm(\'Bạn có chắc muốn thay đổi trạng thái không?\')){window.location.href=\'' . route('products.status_change', encrypt($id)) . '\'}"><i class="fa fa-exchange ' . ($status == activeStatus ? 'text-success' : 'text-danger') . '" title="Thay đổi trạng thái"></i></a>';
+                $html .= '<a onclick="event.stopImmediatePropagation();if(confirm(\'Bạn có chắc muốn thay đổi trạng thái không?\')){window.location.href=\'' . route('products.status_change', encrypt($id)) . '\'}"><i class="ml-2 fa fa-exchange ' . ($status == activeStatus ? 'text-success' : 'text-danger') . '" title="Thay đổi trạng thái"></i></a>';
                 break;
             case 'payments':
-                $html .= '<a onclick="event.stopImmediatePropagation();if(confirm(\'Bạn có chắc muốn thay đổi trạng thái không?\')){window.location.href=\'' . route('payments.status_change', encrypt($id)) . '\'}"><i class="fa fa-exchange ' . ($status == activeStatus ? 'text-success' : 'text-danger') . '" title="Thay đổi trạng thái"></i></a>';
+                $html .= '<a onclick="event.stopImmediatePropagation();if(confirm(\'Bạn có chắc muốn thay đổi trạng thái không?\')){window.location.href=\'' . route('payments.status_change', encrypt($id)) . '\'}"><i class="ml-2 fa fa-exchange ' . ($status == activeStatus ? 'text-success' : 'text-danger') . '" title="Thay đổi trạng thái"></i></a>';
                 break;
             default:
                 break;
         }
+    }
+    return $html;
+}
+
+function checkDisabled($id, $listId)
+{
+    return in_array($id, $listId) ? 'disabled' : '';
+}
+
+function checkcheck($id, $listId, $action)
+{
+    $html = '';
+    if (in_array($id, $listId)) {
+        $html .= '<a href="'.route($action, encrypt($id)). '" class="dropdown-item"> <i class="text-primary mr-1 fa fa-edit"></i>Sửa</a>';
+    } else {
+        $html .= '<a href="'.route($action, encrypt($id)). '" class="dropdown-item"> <i class="text-primary mr-1 fa fa-edit"></i>Sửa</a>';
+        $html .= '<button type="submit" class="dropdown-item" onclick="return confirm(\'Bạn có chắc muốn xóa thương hiệu này không?\')"><i class="text-danger mr-1 fa fa-trash"></i>Xóa</button>';
     }
     return $html;
 }
