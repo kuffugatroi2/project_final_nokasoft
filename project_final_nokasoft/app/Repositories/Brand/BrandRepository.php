@@ -11,6 +11,7 @@ class BrandRepository extends AbstractRepository implements BrandRepositoryInter
 
     public function all($filter = [])
     {
+        // Lấy brands
         $brands = self::$model::whereNull('deleted_at');
         if (isset($filter['name'])) {
             $brands->where('name','like','%'.$filter['name'].'%');
@@ -21,16 +22,35 @@ class BrandRepository extends AbstractRepository implements BrandRepositoryInter
         if (isset($filter['created_by'])) {
             $brands->where('created_by', $filter['created_by']);
         }
-        $brands = $brands->paginate($filter['select-item'] ?? 8);
-        return $brands;
+        $brands = $brands->orderby('id','desc')->paginate($filter['select-item'] ?? 8);
+
+        // Lấy admin tạo các brands
+        $admins = self::$model::with(['admin' => function ($query) {
+            $query->select('id', 'name'); // Chọn các trường bạn muốn lấy từ bảng admin
+        }])->whereNull('deleted_at')->get();
+        $adminIds = $admins->pluck('admin.id')->unique()->values()->all();
+        $adminNames = $admins->pluck('admin.name')->unique()->values()->all();
+        $admins = array_map(function ($id, $name) {
+            return ['id' => $id, 'name' => $name];
+        }, $adminIds, $adminNames);
+
+        return [
+            'brands' => $brands,
+            'admins' => $admins,
+        ];
     }
 
-    public function getListNameBrand()
+    public function getListBrand()
     {
-        return Brand::all()->pluck('name')->toArray();
+        $listNameBrand = self::$model::whereNull('deleted_at')->pluck('name')->toArray();
+        $listBrand = self::$model::whereNull('deleted_at')->select('id', 'name')->get();
+        return [
+            'listNameBrand' => $listNameBrand,
+            'listBrand' => $listBrand,
+        ];
     }
 
-    public function deleteAll($brandIds)
+    public function deleteAll($brandIds, $today)
     {
         Brand::whereIn('id', $brandIds)->update(['deleted_at' => now()]);
         return;

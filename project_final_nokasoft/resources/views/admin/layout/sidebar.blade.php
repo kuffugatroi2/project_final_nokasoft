@@ -30,7 +30,7 @@
                     <li><a><i class="fa fa-mobile"></i> Quản lý sản phẩm <span class="fa fa-chevron-down"></span></a>
                         <ul class="nav child_menu">
                             <li><a href="{{ route('brands.index') }}">Thương hiệu</a></li>
-                            <li><a href="#">Danh mục</a></li>
+                            <li><a href="{{ route('categories.index') }}">Danh mục</a></li>
                             <li><a href="#">Sản phẩm</a></li>
                         </ul>
                     </li>

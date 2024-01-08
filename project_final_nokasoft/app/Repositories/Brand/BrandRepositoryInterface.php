@@ -6,6 +6,6 @@ use App\Repositories\AbstractRepositoryInterface;
 
 interface BrandRepositoryInterface extends AbstractRepositoryInterface
 {
-    public function getListNameBrand();
-    public function deleteAll($arrayId);
+    public function getListBrand();
+    public function deleteAll($arrayId, $today);
 }

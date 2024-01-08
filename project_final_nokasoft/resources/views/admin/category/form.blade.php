@@ -4,7 +4,7 @@
         <div class="col-md-12 col-sm-12 ">
             <div class="x_panel">
                 <div class="x_title">
-                    <h2>Form thông tin thương hiệu</h2>
+                    <h2>Form thông tin danh mục</h2>
                     <ul class="nav navbar-right panel_toolbox">
                         <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
                         </li>
@@ -20,35 +20,61 @@
                             @method('PUT')
                         @endif
                         <div class="field item form-group">
-                            <label class="col-form-label col-md-3 col-sm-3 label-align">Thương hiệu<span
+                            <label class="col-form-label col-md-3 col-sm-3 label-align">Thương hiệu</label>
+                            <div class="col-md-6 col-sm-6">
+                                <select class="form-control" name="brand_id">
+                                    @if (isset($brands))
+                                        @foreach ($brands['listBrand'] as $value)
+                                            <option value="{{ $value->id }}">{{ $value->name }}</option>
+                                        @endforeach
+                                    @else
+                                        <option value="{{ $category['data']->brand_id }}">
+                                            {{ $category['data']->brand->name }}</option>
+                                    @endif
+                                </select>
+                            </div>
+                        </div>
+                        <div class="field item form-group">
+                            <label class="col-form-label col-md-3 col-sm-3 label-align">Danh mục<span
                                     class="text-danger h5">*</span></label>
                             <div class="col-md-6 col-sm-6">
                                 <input type="text" id="name" class="form-control" data-validate-length-range="6"
                                     data-validate-words="2" name="name" placeholder="Nhập tên thương hiệu" required
-                                    value="{{ $brand['data']->name ?? '' }}" />
+                                    value="{{ $category['data']->name ?? '' }}" />
                                 @error('name')
                                     <div class="text-danger">{{ $message }}</div>
                                 @enderror
-                                {{-- <div id="alert" style="opacity: 1; transition: opacity 2s;"> --}}
                                 @if (session('error'))
                                     <div class="text-danger">
                                         {{ session('error') }}
                                     </div>
                                 @endif
-                                {{-- </div> --}}
+                            </div>
+                        </div>
+                        <div class="field item form-group">
+                            <label class="col-form-label col-md-3 col-sm-3 label-align">Loại<span
+                                    class="text-danger h5">*</span></label>
+                            <div class="col-md-6 col-sm-6">
+                                <input type="text" id="type" class="form-control" data-validate-length-range="6"
+                                    data-validate-words="2" name="type" placeholder="Nhập loại sản phẩm" required
+                                    value="{{ $category['data']->type ?? '' }}"
+                                    {{ isset($category['data']) ? 'readonly' : '' }} />
+                                @error('type')
+                                    <div class="text-danger">{{ $message }}</div>
+                                @enderror
                             </div>
                         </div>
                         <div class="field item form-group">
                             <label class="col-form-label col-md-3 col-sm-3 label-align">Trạng thái</label>
-                            @if (!empty($brand['data']->status))
+                            @if (!empty($category['data']->status))
                                 <div class="form-check form-check-inline ml-3">
                                     <input class="form-check-input" type="radio" value="active" name="status"
-                                        @if ($brand['data']->status == 'active') checked @endif>
+                                        @if ($category['data']->status == 'active') checked @endif>
                                     <label class="form-check-label" for="inlineradio">Active</label>
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <input class="form-check-input" type="radio" value="unactive" name="status"
-                                        @if ($brand['data']->status == 'unactive') checked @endif>
+                                        @if ($category['data']->status == 'unactive') checked @endif>
                                     <label class="form-check-label" for="inlineradio">Unactive</label>
                                 </div>
                             @else
@@ -68,7 +94,8 @@
                                 <div class="col-md-6 offset-md-3">
                                     <button type='submit' class="btn btn-success">Submit</button>
                                     <button type='reset' class="btn btn-primary">Reset</button>
-                                    <a href="{{ route('brands.index') }}" class="btn btn-warning text-danger">Come back <i class="fa fa-backward"></i></a>
+                                    <a href="{{ route('categories.index') }}" class="btn btn-warning text-danger">Come back
+                                        <i class="fa fa-backward"></i></a>
                                 </div>
                             </div>
                         </div>
@@ -78,14 +105,3 @@
         </div>
     </div>
 @endsection
-
-<script>
-    function validateForm() {
-        var nameInput = document.getElementById("name");
-        if (nameInput.value === "") {
-            alert("Vui lòng nhập dữ liệu những ô có gắn (*) ");
-            return false;
-        }
-        return true;
-    }
-</script>

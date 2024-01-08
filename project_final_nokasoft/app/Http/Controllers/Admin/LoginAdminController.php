@@ -24,7 +24,7 @@ class LoginAdminController extends Controller
         if (Auth::guard('admin')->attempt($data)) {
             return redirect()->route('admin.home');
         } else {
-            return redirect()->back()->with('message', 'Email hoặc Password sai!');
+            return redirect()->back()->with('error', 'Email hoặc Password sai!');
         }
     }
 
